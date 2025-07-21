@@ -1,13 +1,43 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import React, { useState } from 'react';
+import { AuthPage } from './auth/AuthPage';
+import { Layout } from '@/components/shared/Layout';
+import { PatientDashboard } from './patient/PatientDashboard';
+import { DoctorDashboard } from './doctor/DoctorDashboard';
+import { ReceptionistDashboard } from './receptionist/ReceptionistDashboard';
 
 const Index = () => {
+  const [currentUser, setCurrentUser] = useState<{role: string} | null>(null);
+
+  const handleAuthenticated = (role: string) => {
+    setCurrentUser({ role });
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+  };
+
+  if (!currentUser) {
+    return <AuthPage onAuthenticated={handleAuthenticated} />;
+  }
+
+  const renderDashboard = () => {
+    switch (currentUser.role) {
+      case 'patient':
+        return <PatientDashboard />;
+      case 'doctor':
+        return <DoctorDashboard />;
+      case 'receptionist':
+      case 'admin':
+        return <ReceptionistDashboard />;
+      default:
+        return <PatientDashboard />;
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <Layout userRole={currentUser.role}>
+      {renderDashboard()}
+    </Layout>
   );
 };
 
